@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Chat System Console\Server.csproj", "{C38FC98F-5F7B-42ED-BC69-57F609DAA6AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{91E779AB-8BAE-4A2A-9DD0-B87EC59D3280}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C38FC98F-5F7B-42ED-BC69-57F609DAA6AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C38FC98F-5F7B-42ED-BC69-57F609DAA6AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C38FC98F-5F7B-42ED-BC69-57F609DAA6AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C38FC98F-5F7B-42ED-BC69-57F609DAA6AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91E779AB-8BAE-4A2A-9DD0-B87EC59D3280}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91E779AB-8BAE-4A2A-9DD0-B87EC59D3280}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91E779AB-8BAE-4A2A-9DD0-B87EC59D3280}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91E779AB-8BAE-4A2A-9DD0-B87EC59D3280}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A814C799-8BF8-41D5-A630-AA0236229789}
+	EndGlobalSection
+EndGlobal
