@@ -63,7 +63,7 @@ namespace Client
                 while(!client.Connected)
                 {
                     attempts++;
-                    client.Connect(IPAddress.Loopback, 16969);
+                    client.Connect(IPAddress.Parse("112.204.108.171"), 16969);
                 }
             }
             catch (Exception ex)
