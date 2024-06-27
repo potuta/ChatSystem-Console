@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Client
@@ -25,33 +26,67 @@ namespace Client
                 client.Client.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveData), client);
                 if (Console.ReadKey().Key == ConsoleKey.Enter)
                 {
+                    //Console.Write("You: ");
+                    //SendData();
+
                     Console.Write("You: ");
-                    SendData();
+                    string message = Console.ReadLine();
+                    byte[] dataBuffer = Encoding.ASCII.GetBytes(message);
+                    client.Client.BeginSend(dataBuffer, 0, dataBuffer.Length, SocketFlags.None, new AsyncCallback(SendCallBack), client);
                 }
+            }
+        }
+
+        private static void SendCallBack(IAsyncResult ar)
+        {
+            while (true)
+            {
+                TcpClient client = (TcpClient)ar.AsyncState;
+                while (client.Connected)
+                {
+                    client.Client.EndSend(ar);
+                    string message = Console.ReadLine();
+                    byte[] dataBuffer = Encoding.ASCII.GetBytes(message);
+                    Console.Write("You: ");
+                    client.Client.BeginSend(dataBuffer, 0, dataBuffer.Length, SocketFlags.None, new AsyncCallback(SendCallBack), client);
+                    break;
+                }
+                break;
             }
         }
 
         private static void ReceiveData(IAsyncResult ar)
         {
-            TcpClient client = (TcpClient)ar.AsyncState;
-            int received = client.Client.EndReceive(ar);
-            byte[] dataBuffer = new byte[received];
-            Array.Copy(buffer, dataBuffer, received);
-            SR = new StreamReader(client.GetStream());
-            remoteAddress = client.Client.RemoteEndPoint.ToString();
-            string receivedText = Encoding.ASCII.GetString(dataBuffer);
-            Console.Write(remoteAddress + ": " + receivedText);
-            client.Client.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveData), client);
+            while (true)
+            {
+                TcpClient client = (TcpClient)ar.AsyncState;
+                while (client.Connected)
+                {
+                    int received = client.Client.EndReceive(ar);
+                    byte[] dataBuffer = new byte[received];
+                    Array.Copy(buffer, dataBuffer, received);
+                    SR = new StreamReader(client.GetStream());
+                    remoteAddress = client.Client.RemoteEndPoint.ToString();
+                    string receivedText = Encoding.ASCII.GetString(dataBuffer);
+                    Console.WriteLine(remoteAddress + ": " + receivedText);
+                    client.Client.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveData), client);
+                    break;
+                }
+                break;
+            }
         }
 
         private static void SendData()
         {
             while (true)
             {
-                SW = new StreamWriter(client.GetStream());
-                SW.AutoFlush = true;
-                SW.WriteLine(Console.ReadLine());
-                Console.Write("You: ");
+                while (client.Connected)
+                {
+                    SW = new StreamWriter(client.GetStream());
+                    SW.AutoFlush = true;
+                    SW.WriteLine(Console.ReadLine());
+                    Console.Write("You: ");
+                }
             }
         }
 

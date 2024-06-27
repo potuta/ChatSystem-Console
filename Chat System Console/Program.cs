@@ -29,13 +29,38 @@ namespace Server
             {
                 while (clientList[i].Connected)
                 {
-                    clientList[i].Client.BeginReceive(buffer, 0 , buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveData), client);
+                    clientList[i].Client.BeginReceive(buffer, 0 , buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveData), clientList[i]);
                     if (Console.ReadKey().Key == ConsoleKey.Enter)
                     {
+                        //Console.Write("You: ");
+                        //SendData();
                         Console.Write("You: ");
-                        SendData();
+                        string message = Console.ReadLine();
+                        byte[] dataBuffer = Encoding.ASCII.GetBytes(message);
+                        clientList[i].Client.BeginSend(dataBuffer, 0, dataBuffer.Length, SocketFlags.None, new AsyncCallback(SendCallBack), clientList[i]);
                     }
                 }
+            }
+        }
+        private static void SendCallBack(IAsyncResult ar)
+        {
+            while (true)
+            {
+                TcpClient client = (TcpClient)ar.AsyncState;
+                for (int i = 0; i < clientList.Count; i++)
+                {
+                    while (clientList[i].Connected)
+                    {
+                        client = clientList[i];
+                        client.Client.EndSend(ar);
+                        string message = Console.ReadLine();
+                        byte[] dataBuffer = Encoding.ASCII.GetBytes(message);
+                        Console.Write("You: ");
+                        client.Client.BeginSend(dataBuffer, 0, dataBuffer.Length, SocketFlags.None, new AsyncCallback(SendCallBack), client);
+                        break;
+                    }
+                }
+                break;
             }
         }
 
@@ -59,21 +84,26 @@ namespace Server
 
         private static void ReceiveData(IAsyncResult ar)
         {
-            TcpClient client = (TcpClient)ar.AsyncState;
-            for (int i = 0; i < clientList.Count; i++)
+            while (true)
             {
-                if (clientList[i].Connected)
+                TcpClient client = (TcpClient)ar.AsyncState;
+                for (int i = 0; i < clientList.Count; i++)
                 {
-                    client = clientList[i];
+                    while (clientList[i].Connected)
+                    {
+                        client = clientList[i];
+                        int received = client.Client.EndReceive(ar);
+                        byte[] dataBuffer = new byte[received];
+                        Array.Copy(buffer, dataBuffer, received);
+                        remoteAddress = client.Client.RemoteEndPoint.ToString();
+                        string receivedText = Encoding.ASCII.GetString(dataBuffer);
+                        Console.WriteLine(remoteAddress + ": " + receivedText);
+                        client.Client.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveData), client);
+                        break;
+                    }
                 }
+                break;
             }
-            int received = client.Client.EndReceive(ar);
-            byte[] dataBuffer = new byte[received];
-            Array.Copy(buffer, dataBuffer, received);
-            remoteAddress = client.Client.RemoteEndPoint.ToString();
-            string receivedText = Encoding.ASCII.GetString(dataBuffer);
-            Console.Write(remoteAddress + ": " + receivedText);
-            client.Client.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveData), client);
         }
 
         private static void SendData()
